@@ -14,6 +14,7 @@ type MatrixClient struct {
 	refreshToken  string
 	transactionID int
 	client        http.Client
+	nextBatch     string
 }
 
 type ErrorResponse struct {
@@ -27,6 +28,7 @@ func NewClient(server string) MatrixClient {
 		server:        server,
 		transactionID: 0,
 		client:        client,
+		nextBatch: "",
 	}
 }
 
