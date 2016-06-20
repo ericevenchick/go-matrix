@@ -101,11 +101,12 @@ func (me *MatrixClient) SyncOnce() (Sync, error) {
 	params := url.Values{}
 	params.Add("access_token", me.accessToken)
 	params.Add("timeout", "10000")
-	uri.RawQuery = params.Encode()
 
 	if me.nextBatch != "" {
-		uri.Query().Add("since", me.nextBatch)
+		params.Add("since", me.nextBatch)
 	}
+
+	uri.RawQuery = params.Encode()
 
 	var response Sync
 	err := me.makeMatrixRequest("GET", uri.String(), nil, &response)
