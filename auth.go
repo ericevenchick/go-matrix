@@ -16,7 +16,7 @@ type LoginResponse struct {
 }
 
 func (me *MatrixClient) PasswordLogin(user string, pass string) error {
-	uri := me.server + "/_matrix/client/r0/login"
+	uri := me.endpoints.login
 	req := LoginRequest{
 		Password: pass,
 		Medium:   "email",
@@ -25,7 +25,7 @@ func (me *MatrixClient) PasswordLogin(user string, pass string) error {
 	}
 
 	var resp LoginResponse
-	err := me.makeMatrixRequest("POST", uri, req, &resp)
+	err := me.makeMatrixRequest("POST", uri.String(), req, &resp)
 	if err != nil {
 		return err
 	}

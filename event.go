@@ -1,7 +1,9 @@
 package matrix
 
 import (
-	"fmt"
+	"net/url"
+	"path"
+	"strconv"
 )
 
 type SendEventResponse struct {
@@ -76,13 +78,16 @@ type EventContent struct {
 }
 
 func (me *MatrixClient) SendEvent(roomID string, eventType string, event interface{}) error {
-	uri := (me.server + "/_matrix/client/r0/rooms/" + roomID + "/send/" +
-		eventType + fmt.Sprintf("/m%d", me.transactionID) +
-		"?access_token=" + me.accessToken)
+	uri := me.endpoints.room
+	uri.Path += path.Join(roomID, "send", eventType, "m"+strconv.Itoa(me.transactionID))
+	params := url.Values{}
+	params.Add("access_token", me.accessToken)
+	uri.RawQuery = params.Encode()
+
 	me.transactionID += 1
 
 	var response SendEventResponse
-	err := me.makeMatrixRequest("PUT", uri, event, &response)
+	err := me.makeMatrixRequest("PUT", uri.String(), event, &response)
 
 	if err != nil {
 		return err
@@ -92,15 +97,18 @@ func (me *MatrixClient) SendEvent(roomID string, eventType string, event interfa
 }
 
 func (me *MatrixClient) SyncOnce() (Sync, error) {
-	uri := (me.server + "/_matrix/client/r0/sync" + "?access_token=" +
-		me.accessToken + "&timeout=10000")
+	uri := me.endpoints.sync
+	params := url.Values{}
+	params.Add("access_token", me.accessToken)
+	params.Add("timeout", "10000")
+	uri.RawQuery = params.Encode()
 
 	if me.nextBatch != "" {
-		uri = uri + "&since=" + me.nextBatch
+		uri.Query().Add("since", me.nextBatch)
 	}
 
 	var response Sync
-	err := me.makeMatrixRequest("GET", uri, nil, &response)
+	err := me.makeMatrixRequest("GET", uri.String(), nil, &response)
 
 	// update nextBatch so we only sync new messages next time
 	me.nextBatch = response.NextBatch
