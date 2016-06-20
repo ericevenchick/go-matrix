@@ -28,7 +28,7 @@ func NewClient(server string) MatrixClient {
 		server:        server,
 		transactionID: 0,
 		client:        client,
-		nextBatch: "",
+		nextBatch:     "",
 	}
 }
 
