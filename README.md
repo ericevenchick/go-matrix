@@ -5,6 +5,7 @@ A Go library for Matrix.org Clients
 - Login to HomeServer
 - Joining Rooms
 - Sending Events
+- Receiving Events
 
 ## Example
 ```
